@@ -10,9 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sangcomz.fishbun.FishBun
+import com.sangcomz.fishbun.MimeType
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter
 import com.sangcomz.fishbun.adapter.image.impl.CoilAdapter
-import kotlinx.android.synthetic.main.activity_withactivity.*
+import com.sangcomz.fishbundemo.databinding.ActivityWithactivityBinding
 import java.util.*
 
 class WithActivityActivity : AppCompatActivity() {
@@ -20,21 +21,23 @@ class WithActivityActivity : AppCompatActivity() {
     var path = ArrayList<Uri>()
     private lateinit var imageAdapter: ImageAdapter
     private var mode: Int = 0
+    private lateinit var binding: ActivityWithactivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_withactivity)
+        binding = ActivityWithactivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         mode = intent.getIntExtra("mode", -1)
 
-        with(recyclerview) {
+        with(binding.recyclerview) {
             layoutManager = LinearLayoutManager(
                 this@WithActivityActivity,
                 LinearLayoutManager.HORIZONTAL,
                 false
             )
 
-            imageAdapter = ImageAdapter(context, ImageController(img_main), path)
+            imageAdapter = ImageAdapter(context, ImageController(binding.imgMain), path)
             adapter = imageAdapter
         }
     }
@@ -46,7 +49,7 @@ class WithActivityActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, imageData)
 
         if (requestCode == FishBun.FISHBUN_REQUEST_CODE && resultCode == RESULT_OK) {
-            path = imageData!!.getParcelableArrayListExtra(FishBun.INTENT_PATH)
+            path = imageData?.getParcelableArrayListExtra(FishBun.INTENT_PATH) ?: arrayListOf()
             imageAdapter.changePath(path)
         }
     }
@@ -84,8 +87,8 @@ class WithActivityActivity : AppCompatActivity() {
                         .setSelectedImages(path)
                         .setAlbumSpanCount(2, 3)
                         .setButtonInAlbumActivity(false)
-                        .setCamera(true)
-                        .exceptGif(true)
+                        .hasCameraInPickerPage(true)
+                        .exceptMimeType(arrayListOf(MimeType.GIF))
                         .setReachLimitAutomaticClose(true)
                         .setHomeAsUpIndicatorDrawable(
                             ContextCompat.getDrawable(
@@ -119,8 +122,8 @@ class WithActivityActivity : AppCompatActivity() {
                         .setSelectedImages(path)
                         .setAlbumSpanCount(1, 2)
                         .setButtonInAlbumActivity(true)
-                        .setCamera(false)
-                        .exceptGif(true)
+                        .hasCameraInPickerPage(false)
+                        .exceptMimeType(arrayListOf(MimeType.GIF))
                         .setReachLimitAutomaticClose(false)
                         .setHomeAsUpIndicatorDrawable(
                             ContextCompat.getDrawable(
